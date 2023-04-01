@@ -9,10 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-amplify/ui-react": "^4.4.3",
     "@next/font": "13.2.4",
+    "aws-amplify": "^5.0.23",
     "eslint": "8.37.0",
     "eslint-config-next": "13.2.4",
     "next": "13.2.4",
+    "papaparse": "^5.4.1",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   }
