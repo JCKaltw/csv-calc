@@ -29,3 +29,32 @@
 .uploadButton:hover {
   background-color: #45a049;
 }
+
+.file-input {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.file-input input[type="file"] {
+  display: none;
+}
+
+.file-input label {
+  display: inline-block;
+  background-color: #0070f3;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 200ms;
+}
+
+.file-input label:hover {
+  background-color: #005cc5;
+}
+
+.file-input span {
+  font-size: 0.9rem;
+}

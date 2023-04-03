@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
+import styles from '../styles/Home.module.css'; // Import the new styles
 
-const CSVUploader = ({ onFileLoaded, uploadButtonClassName }) => {
+const CSVUploader = ({ onFileLoaded }) => {
   const [file, setFile] = useState(null);
 
   const handleFileChange = (e) => {
@@ -21,9 +22,15 @@ const CSVUploader = ({ onFileLoaded, uploadButtonClassName }) => {
   };
 
   return (
-    <div>
-      <input type="file" accept=".csv" onChange={handleFileChange} />
-      <button className={uploadButtonClassName} onClick={handleFileUpload}>
+    <div className={styles['file-input']}>
+      <input type="file" id="file-upload" accept=".csv" onChange={handleFileChange} />
+      <label htmlFor="file-upload" className={styles['label']}> {/* Update this line */}
+        Browse...
+      </label>
+      <span>
+        {file ? file.name : 'No files selected'}
+      </span>
+      <button className={styles['uploadButton']} onClick={handleFileUpload}>
         Upload CSV
       </button>
     </div>
