@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import styles from './CSVTable.module.css';
 
 const CSVTable = ({ initialData }) => {
   const [data, setData] = useState(initialData);
@@ -72,13 +73,13 @@ const CSVTable = ({ initialData }) => {
   };
 
   return (
-    <div>
+    <div className={styles.CSVTable}>
       {history.map((tableData, index) => (
         <div key={index}>
           <button onClick={() => toggleTableVisibility(index)}>
             {tableData.visible ? "Hide" : "Show"} Table {index + 1}
           </button>
-          <span>{tableData.command}</span>
+          <span className={styles["history-command"]}>{tableData.command}</span>
           {tableData.visible && (
             <Table data={tableData.data} headers={tableData.headers} />
           )}
