@@ -18,10 +18,6 @@ const CSVTable = ({ initialData }) => {
   if (!data || data.length === 0) return null;
 
   const addColumn = (columnName, columnLetter, startVal, incVal) => {
-    // Store the current data state, headers, and command in the history before making modifications
-    const command = `Add "${columnName}" ${columnLetter} ${startVal} ${incVal}`;
-    setHistory([...history, { data, headers, visible: false, command }]);
-  
     const columnIndex = colLetterToIndex(columnLetter);
     const newData = data.map((row, rowIndex) => {
       const newRow = { ...row };
@@ -50,6 +46,7 @@ const CSVTable = ({ initialData }) => {
   
     setData(newData);
     setHeaders(Object.keys(newData[0]));
+    setHistory([...history, { data: newData, visible: false }]);
   };
   
   const sumColumn = (columnIndex) => {
@@ -78,9 +75,8 @@ const CSVTable = ({ initialData }) => {
           <button onClick={() => toggleTableVisibility(index)}>
             {tableData.visible ? "Hide" : "Show"} Table {index + 1}
           </button>
-          <span>{tableData.command}</span>
           {tableData.visible && (
-            <Table data={tableData.data} headers={tableData.headers} />
+            <Table data={tableData.data} headers={headers} />
           )}
         </div>
       ))}
