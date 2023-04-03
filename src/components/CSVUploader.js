@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
 
-const CSVUploader = ({ onFileLoaded }) => {
+const CSVUploader = ({ onFileLoaded, uploadButtonClassName }) => {
   const [file, setFile] = useState(null);
 
   const handleFileChange = (e) => {
@@ -19,12 +19,13 @@ const CSVUploader = ({ onFileLoaded }) => {
       dynamicTyping: true,
     });
   };
-  
 
   return (
     <div>
       <input type="file" accept=".csv" onChange={handleFileChange} />
-      <button onClick={handleFileUpload}>Upload CSV</button>
+      <button className={uploadButtonClassName} onClick={handleFileUpload}>
+        Upload CSV
+      </button>
     </div>
   );
 };

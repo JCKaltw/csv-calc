@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import CSVUploader from '../components/CSVUploader';
 import CSVTable from '../components/CSVTable';
+import styles from '../styles/Home.module.css'; // Import the new styles
 
 export default function Home() {
   const [csvData, setCsvData] = useState(null);
@@ -10,9 +11,9 @@ export default function Home() {
   };
 
   return (
-    <div>
-      <h1>CSV File Upload and Computation</h1>
-      <CSVUploader onFileLoaded={handleFileLoaded} />
+    <div className={styles.home}>
+      <h1 className={styles.heading}>CSV File Upload and Computation</h1>
+      <CSVUploader onFileLoaded={handleFileLoaded} uploadButtonClassName={styles.uploadButton} />
       <CSVTable initialData={csvData} />
     </div>
   );
