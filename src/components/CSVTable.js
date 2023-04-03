@@ -3,14 +3,18 @@ import React, { useState, useEffect } from "react";
 const CSVTable = ({ initialData }) => {
   const [data, setData] = useState(initialData);
   const [result, setResult] = useState(null);
+  const [headers, setHeaders] = useState(initialData && initialData.length > 0 ? Object.keys(initialData[0]) : []);
 
-  useEffect(() => { // Add this useEffect hook
+  useEffect(() => {
     setData(initialData);
-  }, [initialData]); // Pass initialData as a dependency
+    if (initialData && initialData.length > 0) {
+      setHeaders(Object.keys(initialData[0]));
+    } else {
+      setHeaders([]);
+    }
+  }, [initialData]);
 
   if (!data || data.length === 0) return null;
-
-  const headers = Object.keys(data[0]);
 
   const addColumn = (columnName, columnLetter, startVal, incVal) => {
     const columnIndex = colLetterToIndex(columnLetter);
@@ -19,18 +23,27 @@ const CSVTable = ({ initialData }) => {
       newRow[columnName] = startVal + rowIndex * incVal;
   
       const updatedRow = {};
-      for (let i = 0, j = 0; i < Object.keys(newRow).length; i++, j++) {
-        if (j === columnIndex) {
+      let newColumnInserted = false;
+      let keys = Object.keys(newRow);
+  
+      for (let i = 0, j = 0; i < keys.length; i++, j++) {
+        if (j === columnIndex && !newColumnInserted) {
           updatedRow[columnName] = newRow[columnName];
-          j++;
+          newColumnInserted = true;
+          i--;
+        } else {
+          updatedRow[keys[i]] = newRow[keys[i]];
         }
-        updatedRow[Object.keys(newRow)[i]] = newRow[Object.keys(newRow)[i]];
+      }
+  
+      if (!newColumnInserted) {
+        updatedRow[columnName] = newRow[columnName];
       }
   
       return updatedRow;
     });
-  
-    setData(newData); // Update the state with newData
+    setData(newData);
+    setHeaders(Object.keys(newData[0]));
   };
   
   const sumColumn = (columnIndex) => {
@@ -84,7 +97,10 @@ const compute = (command, addColumnFn, sumColumnFn) => {
     return sumColumnFn(columnIndex);
   } else if (operation === "add") {
     const columnExpression = commandParts.slice(1).join(" ");
-    const [columnName, columnIndex] = colLetterToIndex(columnExpression, true);
+
+    const [columnName, colLetter] = extractColumnNameAndLetter(columnExpression);
+    const columnIndex = colLetterToIndex(String(colLetter).toUpperCase()); // Convert colLetter to a string and then to uppercase
+
     const [startVal, incVal] = columnName
       ? columnExpression
           .split(/\s+/)
@@ -92,7 +108,7 @@ const compute = (command, addColumnFn, sumColumnFn) => {
           .map((val) => parseInt(val))
       : [1, 1];
 
-    addColumnFn(columnName, columnIndex, startVal || 1, incVal || 1);
+    addColumnFn(columnName, colLetter, startVal || 1, incVal || 1); // Pass colLetter instead of columnIndex
 
     return "Column added successfully";
   }
@@ -100,17 +116,31 @@ const compute = (command, addColumnFn, sumColumnFn) => {
   return "Invalid command";
 };
 
+const extractColumnNameAndLetter = (columnExpression) => {
+  const columnName = columnExpression.match(/"[^"]+"/g)?.[0]?.replace(/"/g, "") || "";
+  const colLetter = columnExpression.replace(/"[^"]+"/g, "").match(/[A-Z]+/i)?.[0] || "";
+  return [columnName, colLetter];
+};
+
+
 const colLetterToIndex = (colLetter, returnName = false) => {
   let columnName = String(colLetter).match(/"[^"]+"/g); // Convert colLetter to a string
   columnName = columnName ? columnName[0].replace(/"/g, "") : "";
 
-  const letters = String(colLetter).replace(/"[^"]+"/g, "").toUpperCase(); // Convert colLetter to a string
+  const letters = String(colLetter).match(/[A-Z]+/i); // Extract only the column letters
+
   let columnIndex = 0;
-  for (let i = 0; i < letters.length; i++) {
-    columnIndex =
-      columnIndex * 26 + (letters.charCodeAt(i) - "A".charCodeAt(0) + 1);
+  if (letters) {
+    for (let i = 0; i < letters[0].length; i++) {
+      columnIndex =
+        columnIndex * 26 + (letters[0].charCodeAt(i) - "A".charCodeAt(0) + 1);
+    }
   }
-  return returnName ? [columnName, columnIndex - 1] : columnIndex - 1;
+  columnIndex = columnIndex - 1;
+  if (isNaN(columnIndex) || columnIndex < 0) columnIndex = 0;
+
+  const returnValue = returnName ? [columnName, columnIndex] : columnIndex;
+  return returnValue;
 };
 
 const CommandInput = ({ onResult, addColumn, sumColumn }) => {
